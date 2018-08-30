@@ -4,9 +4,13 @@ from tensorflow.python.layers import base as base_layer
 
 class NeuralAccumulator(base_layer.Layer):
 
-    def __init__(self):
-        super(NeuralAccumulator, self).__init__()
-        pass
+    def __init__(self, outputs, name=None, kernel_initializer=None):
+        super(NeuralAccumulator, self).__init__(name=name)
+        self._outputs = outputs
+        self._w_init = kernel_initializer
+
+    def compute_output_shape(self, input_shape):
+        return self._outputs
 
     def build(self, inputs_shape):
         """
@@ -17,8 +21,9 @@ class NeuralAccumulator(base_layer.Layer):
         Returns:
             builds cell weights
         """
-        self._w = self.add_variable("w_hat", shape=inputs_shape)
-        self._m = self.add_variable("m_hat", shape=inputs_shape)
+        size = (inputs_shape[-1], self._outputs)
+        self._w = self.add_variable("w_hat", shape=size, initializer=self._w_init)
+        self._m = self.add_variable("m_hat", shape=size, initializer=self._w_init)
 
         self.built = True
 

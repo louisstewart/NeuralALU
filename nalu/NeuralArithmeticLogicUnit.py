@@ -4,8 +4,13 @@ from tensorflow.python.layers import base as base_layer
 
 class NeuralALU(base_layer.Layer):
 
-    def __init__(self):
-        super(NeuralALU, self).__init__()
+    def __init__(self, outputs, name=None, kernel_initializer=None):
+        super(NeuralALU, self).__init__(name=name)
+        self._outputs = outputs
+        self._k_init = kernel_initializer
+
+    def compute_output_shape(self, input_shape):
+        return self._outputs
 
     def build(self, inputs_shape):
         """
@@ -16,9 +21,10 @@ class NeuralALU(base_layer.Layer):
         Returns:
             build cell
         """
-        self._w = self.add_variable("w_hat", shape=inputs_shape)
-        self._m = self.add_variable("m_hat", shape=inputs_shape)
-        self._g = self.add_variable("g_hat", shape=inputs_shape)
+        size = (inputs_shape[-1], self._outputs)
+        self._w = self.add_variable("w_hat", shape=size, initializer=self._k_init)
+        self._m = self.add_variable("m_hat", shape=size, initializer=self._k_init)
+        self._g = self.add_variable("g_hat", shape=size, initializer=self._k_init)
         self._epsilon = 0.0000001
 
         self.built = True
@@ -34,10 +40,10 @@ class NeuralALU(base_layer.Layer):
             2D Tensor of NALU activations
         """
         W = tf.multiply(tf.tanh(self._w, name='tanh_w_hat'), tf.sigmoid(self._m, name="sigmoid_m_hat"), name="W")
-        G = tf.sigmoid(tf.matmul(inputs, self._w), name="G")
+        G = tf.sigmoid(tf.matmul(inputs, self._g), name="G")
         m = tf.exp(tf.matmul(tf.log(tf.add(tf.abs(inputs), self._epsilon)), W))
         a = tf.matmul(inputs, W, name="nac_activation")
 
-        y = tf.add(tf.multiply(g, a), tf.multiply((1-g), m))
+        y = tf.add(tf.multiply(G, a), tf.multiply((1-G), m))
 
         return y
