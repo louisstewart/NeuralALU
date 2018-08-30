@@ -22,9 +22,9 @@ class NeuralALU(base_layer.Layer):
             build cell
         """
         size = (inputs_shape[-1], self._outputs)
-        self._w = self.add_variable("w_hat", shape=size, initializer=self._k_init)
-        self._m = self.add_variable("m_hat", shape=size, initializer=self._k_init)
-        self._g = self.add_variable("g_hat", shape=size, initializer=self._k_init)
+        self._w = self.add_variable("w_hat", shape=size, initializer=self._k_init, trainable=True)
+        self._m = self.add_variable("m_hat", shape=size, initializer=self._k_init, trainable=True)
+        self._g = self.add_variable("g_hat", shape=size, initializer=self._k_init, trainable=True)
         self._epsilon = 0.0000001
 
         self.built = True

@@ -22,8 +22,8 @@ class NeuralAccumulator(base_layer.Layer):
             builds cell weights
         """
         size = (inputs_shape[-1], self._outputs)
-        self._w = self.add_variable("w_hat", shape=size, initializer=self._w_init)
-        self._m = self.add_variable("m_hat", shape=size, initializer=self._w_init)
+        self._w = self.add_variable("w_hat", shape=size, initializer=self._w_init, trainable=True)
+        self._m = self.add_variable("m_hat", shape=size, initializer=self._w_init, trainable=True)
 
         self.built = True
 
